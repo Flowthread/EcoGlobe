@@ -1,122 +1,104 @@
-earth
-=====
+# Earth Forward 🌍
 
-**NOTE: the location of `dev-server.js` has changed from `{repository}/server/` to `{repository}/`**
+**Click anywhere on Earth to see its live environmental health: weather, air quality, carbon, and the climate action being taken there.**
 
-"earth" is a project to visualize global weather conditions.
+Built for **NextStep Hacks 2026** — theme: *Earth Forward*.
 
-A customized instance of "earth" is available at http://earth.nullschool.net.
+Earth Forward turns a beautiful global wind visualization into a global **environmental intelligence tool**. Every click answers one question: *"How healthy is this place, and what's being done about it?"*
 
-"earth" is a personal project I've used to learn javascript and browser programming, and is based on the earlier
-[Tokyo Wind Map](https://github.com/cambecc/air) project.  Feedback and contributions are welcome! ...especially
-those that clarify accepted best practices.
+## Live demo
 
-building and launching
-----------------------
+Deployed on Vercel: _(add your deployment URL here)_
 
-After installing node.js and npm, clone "earth" and install dependencies:
+## What it does
 
-    git clone https://github.com/cambecc/earth
-    cd earth
-    npm install
+Click any point on the globe and an **environmental health card** appears with:
 
-Next, launch the development web server:
+- **Location** — city, region, country, elevation (BigDataCloud reverse geocode)
+- **Weather** — current conditions, temperature (incl. feels-like, hi/lo), humidity, wind, pressure, cloud cover, precipitation (Open-Meteo Forecast)
+- **Air Quality** — US AQI with a color-coded category badge, plus PM2.5, PM10, O₃, NO₂, SO₂, CO, dust, UV index, and wildfire smoke (Open-Meteo Air Quality)
+- **Carbon & Greenhouse Gases** — surface CO₂ (ppm) and methane at the point (Open-Meteo Air Quality)
+- **Climate Action** — the containing country's latest emissions, number of reduction targets, whether it has a net-zero pledge, population, and GDP (OpenClimate v1 API)
+- **Environmental Health Score** — a composite 0–100 grade (A–F) blending AQI, PM2.5, and UV
 
-    node dev-server.js 8080
+The original wind animation, 8 map projections, and overlay system are all preserved.
 
-Finally, point your browser to:
+## Data sources (all free, no API key required)
 
-    http://localhost:8080
+| Data | API | Browser? |
+|---|---|---|
+| Weather + elevation + forecast | [Open-Meteo Forecast API](https://open-meteo.com/en/docs) | direct (CORS-enabled) |
+| Air quality (AQI, PM, O₃, NO₂, SO₂, CO, dust, UV) | [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api) | direct |
+| Carbon (CO₂ ppm, methane, wildfire smoke) | [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api) | direct |
+| Place name (city/region/country) | [BigDataCloud reverse geocode](https://www.bigdatacloud.com/client/api) | direct |
+| National emissions, targets, net-zero, population, GDP | [OpenClimate v1 API](https://github.com/Open-Earth-Foundation/OpenClimate) | via serverless proxy |
+| Map, wind animation, projections | [cambecc/earth](https://github.com/cambecc/earth) (self-hosted) | direct |
 
-The server acts as a stand-in for static S3 bucket hosting and so contains almost no server-side logic. It
-serves all files located in the `earth/public` directory. See `public/index.html` and `public/libs/earth/*.js`
-for the main entry points. Data files are located in the `public/data` directory, and there is one sample
-weather layer located at `data/weather/current`.
+## Architecture
 
-*For Ubuntu, Mint, and elementary OS, use `nodejs` instead of `node` instead due to a [naming conflict](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager#ubuntu-mint-elementary-os).
+```
+public/                              <- static earth visualization (Vercel static)
+  index.html                         <- adds #location-extra card container
+  libs/earth/1.0.0/
+    everything.js                    <- NEW: fetches + renders the environmental health card
+    earth.js                         <- modified: hooks everything.js into the click handler
+    globes.js, products.js, micro.js <- original (unchanged)
+  styles/styles.css                  <- modified: adds health card styling
+api/
+  emissions.ts                       <- NEW: Vercel serverless proxy for OpenClimate
+vercel.json                          <- NEW: static + serverless routing
+package.json                         <- modified: adds @vercel/node
+```
 
-getting map data
-----------------
+### How it works
 
-Map data is provided by [Natural Earth](http://www.naturalearthdata.com) but must be converted to
-[TopoJSON](https://github.com/mbostock/topojson/wiki) format. We make use of a couple different map scales: a
-simplified, larger scale for animation and a more detailed, smaller scale for static display. After installing
-[GDAL](http://www.gdal.org/) and TopoJSON (see [here](http://bost.ocks.org/mike/map/#installing-tools)), the
-following commands build these files:
+1. The user clicks anywhere on the globe.
+2. earth's existing `showLocationDetails(point, coord)` runs (it already shows coordinates + wind).
+3. **New:** it also calls `everything.load(lat, lon)`, which fires the browser-direct APIs in parallel (Open-Meteo forecast, Open-Meteo air quality, BigDataCloud geocode).
+4. It then calls the `/api/emissions` serverless proxy, which looks up the country on OpenClimate and returns its emissions/targets.
+5. Results render into the `#location-extra` card with an AQI badge and health score.
 
-    curl "http://www.nacis.org/naturalearth/50m/physical/ne_50m_coastline.zip" -o ne_50m_coastline.zip
-    curl "http://www.nacis.org/naturalearth/50m/physical/ne_50m_lakes.zip" -o ne_50m_lakes.zip
-    curl "http://www.nacis.org/naturalearth/110m/physical/ne_110m_coastline.zip" -o ne_110m_coastline.zip
-    curl "http://www.nacis.org/naturalearth/110m/physical/ne_110m_lakes.zip" -o ne_110m_lakes.zip
-    unzip -o ne_\*.zip
-    ogr2ogr -f GeoJSON coastline_50m.json ne_50m_coastline.shp
-    ogr2ogr -f GeoJSON coastline_110m.json ne_110m_coastline.shp
-    ogr2ogr -f GeoJSON -where "scalerank < 4" lakes_50m.json ne_50m_lakes.shp
-    ogr2ogr -f GeoJSON -where "scalerank < 2 AND admin='admin-0'" lakes_110m.json ne_110m_lakes.shp
-    ogr2ogr -f GeoJSON -simplify 1 coastline_tiny.json ne_110m_coastline.shp
-    ogr2ogr -f GeoJSON -simplify 1 -where "scalerank < 2 AND admin='admin-0'" lakes_tiny.json ne_110m_lakes.shp
-    topojson -o earth-topo.json coastline_50m.json coastline_110m.json lakes_50m.json lakes_110m.json
-    topojson -o earth-topo-mobile.json coastline_110m.json coastline_tiny.json lakes_110m.json lakes_tiny.json
-    cp earth-topo*.json <earth-git-repository>/public/data/
+## Deploy on Vercel
 
-getting weather data
---------------------
+1. Fork/push this repo.
+2. Import it in [Vercel](https://vercel.com) — it auto-detects the `vercel.json` config.
+3. No environment variables needed (all APIs are keyless).
+4. Deploy. The static earth app serves from `public/`; the OpenClimate proxy runs as a serverless function at `/api/emissions`.
 
-Weather data is produced by the [Global Forecast System](http://en.wikipedia.org/wiki/Global_Forecast_System) (GFS),
-operated by the US National Weather Service. Forecasts are produced four times daily and made available for
-download from [NOMADS](http://nomads.ncep.noaa.gov/). The files are in [GRIB2](http://en.wikipedia.org/wiki/GRIB)
-format and contain over [300 records](http://www.nco.ncep.noaa.gov/pmb/products/gfs/gfs.t00z.pgrbf00.grib2.shtml).
-We need only a few of these records to visualize wind data at a particular isobar. The following commands download
-the 1000 hPa wind vectors and convert them to JSON format using the [grib2json](https://github.com/cambecc/grib2json)
-utility:
+Run locally without Vercel: the original `dev-server.js` serves the static app (the emissions proxy only works on Vercel, but the card gracefully omits the climate-action section if the proxy is unreachable).
 
-    YYYYMMDD=<a date, for example: 20140101>
-    curl "http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs.pl?file=gfs.t00z.pgrb2.1p00.f000&lev_10_m_above_ground=on&var_UGRD=on&var_VGRD=on&dir=%2Fgfs.${YYYYMMDD}00" -o gfs.t00z.pgrb2.1p00.f000
-    grib2json -d -n -o current-wind-surface-level-gfs-1.0.json gfs.t00z.pgrb2.1p00.f000
-    cp current-wind-surface-level-gfs-1.0.json <earth-git-repository>/public/data/weather/current
+```
+npm install
+node dev-server.js 8080
+# open http://localhost:8080
+```
 
-font subsetting
----------------
+## Hackathon build breakdown
 
-This project uses [M+ FONTS](http://mplus-fonts.sourceforge.jp/). To reduce download size, a subset font is
-constructed out of the unique characters utilized by the site. See the `earth/server/font/findChars.js` script
-for details. Font subsetting is performed by the [M+Web FONTS Subsetter](http://mplus.font-face.jp/), and
-the resulting font is placed in `earth/public/styles`.
+Per Devpost rules, here's what existed before vs. what was built during NextStep Hacks 2026:
 
-[Mono Social Icons Font](http://drinchev.github.io/monosocialiconsfont/) is used for scalable, social networking
-icons. This can be subsetted using [Font Squirrel's WebFont Generator](http://www.fontsquirrel.com/tools/webfont-generator).
+### Pre-existing (from cambecc/earth, MIT licensed)
+- The global wind visualization, D3 + backbone + Canvas architecture
+- 8 map projections, particle animation, overlay system
+- The static dev server
+- All original `micro.js`, `globes.js`, `products.js`, and most of `earth.js`
 
-implementation notes
---------------------
+### Built during the hackathon
+- **`everything.js`** — new module orchestrating 4 data APIs, with health-score computation, AQI categorization, and card rendering
+- **`api/emissions.ts`** — new Vercel serverless proxy bridging OpenClimate climate-action data to the browser
+- **`earth.js` modification** — hooking the environmental card into the click handler (`showLocationDetails` / `clearLocationDetails`)
+- **`index.html` modification** — the `#location-extra` container + updated metadata
+- **`styles.css` addition** — the full environmental health card UI (AQI badge, score badge, sections, scrollbar)
+- **`vercel.json`** — deployment config for static + serverless
+- **`package.json`** — added `@vercel/node`
 
-Building this project required solutions to some interesting problems. Here are a few:
+## Credits
 
-   * The GFS grid has a resolution of 1°. Intermediate points are interpolated in the browser using [bilinear
-     interpolation](http://en.wikipedia.org/wiki/Bilinear_interpolation). This operation is quite costly.
-   * Each type of projection warps and distorts the earth in a particular way, and the degree of distortion must
-     be calculated for each point (x, y) to ensure wind particle paths are rendered correctly. For example,
-     imagine looking at a globe where a wind particle is moving north from the equator. If the particle starts
-     from the center, it will trace a path straight up. However, if the particle starts from the globe's edge,
-     it will trace a path that curves toward the pole. [Finite difference approximations](http://gis.stackexchange.com/a/5075/23451)
-     are used to estimate this distortion during the interpolation process.
-   * The SVG map of the earth is overlaid with an HTML5 Canvas, where the animation is drawn. Another HTML5
-     Canvas sits on top and displays the colored overlay. Both canvases must know where the boundaries of the
-     globe are rendered by the SVG engine, but this pixel-for-pixel information is difficult to obtain directly
-     from the SVG elements. To workaround this problem, the globe's bounding sphere is re-rendered to a
-     detached Canvas element, and the Canvas' pixels operate as a mask to distinguish points that lie outside
-     and inside the globe's bounds.
-   * Most configuration options are persisted in the hash fragment to allow deep linking and back-button
-     navigation. I use a [backbone.js Model](http://backbonejs.org/#Model) to represent the configuration.
-     Changes to the model persist to the hash fragment (and vice versa) and trigger "change" events which flow to
-     other components.
-   * Components use [backbone.js Events](http://backbonejs.org/#Events) to trigger changes in other downstream
-     components. For example, downloading a new layer produces a new grid, which triggers reinterpolation, which
-     in turn triggers a new particle animator. Events flow through the page without much coordination,
-     sometimes causing visual artifacts that (usually) quickly disappear.
-   * There's gotta be a better way to do this. Any ideas?
+- Wind visualization: [cambecc/earth](https://github.com/cambecc/earth) by Cameron Beccario (MIT)
+- Weather & air quality data: [Open-Meteo](https://open-meteo.com/) (CC BY 4.0, non-commercial)
+- Climate action data: [OpenClimate](https://openclimate.network/) by Open Earth Foundation (Apache-2.0)
+- Reverse geocoding: [BigDataCloud](https://www.bigdatacloud.com/)
 
-inspiration
------------
+## License
 
-The awesome [hint.fm wind map](http://hint.fm/wind/) and [D3.js visualization library](http://d3js.org) provided
-the main inspiration for this project.
+MIT — see `LICENSE.md`. The original earth README is preserved as `earth-original-readme.md`.

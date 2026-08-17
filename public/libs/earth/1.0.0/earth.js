@@ -805,6 +805,18 @@
         if (_.isFinite(λ) && _.isFinite(φ)) {
             d3.select("#location-coord").text(µ.formatCoordinates(λ, φ));
             d3.select("#location-close").classed("invisible", false);
+
+            // Earth Forward: load the full environmental health card for this point.
+            var extraEl = document.getElementById("location-extra");
+            if (extraEl && everything) {
+                everything.showLoading(extraEl);
+                everything.load(λ, φ).then(function (d) {
+                    if (d) everything.render(extraEl, d);
+                    else everything.showError(extraEl);
+                }).catch(function () {
+                    everything.showError(extraEl);
+                });
+            }
         }
 
         if (field.isDefined(point[0], point[1]) && grids) {
@@ -832,6 +844,8 @@
         d3.select("#location-wind-units").text("");
         d3.select("#location-value").text("");
         d3.select("#location-value-units").text("");
+        var extraEl = document.getElementById("location-extra");
+        if (extraEl && everything) everything.clear(extraEl);
         if (clearEverything) {
             activeLocation = {};
             d3.select(".location-mark").remove();

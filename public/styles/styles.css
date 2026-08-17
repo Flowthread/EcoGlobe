@@ -258,6 +258,177 @@ body {
     padding-top: 2rem;
 }
 
+/**************************************************************************************************
+ * Earth Forward Environmental Health Card
+ **************************************************************************************************/
+
+#location-extra {
+    background-color: rgba(0, 0, 5, 0.78);
+    border-radius: 0.5rem/0.5rem;
+    padding: 0.75rem 1rem 0.75rem 1rem;
+    margin-top: 1rem;
+    max-width: 26rem;
+    max-height: 70vh;
+    overflow-y: auto;
+    pointer-events: all;
+    font-size: 1.4rem;
+    line-height: 1.5;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(120, 180, 255, 0.18);
+}
+
+#location-extra.invisible {
+    display: none;
+}
+
+.ef-loading {
+    color: #9bb8d8;
+    font-style: italic;
+    padding: 0.5rem 0;
+}
+
+/* Header: place + health score badge */
+.ef-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.6rem;
+    margin-bottom: 0.6rem;
+    border-bottom: 1px solid rgba(120, 180, 255, 0.15);
+}
+
+.ef-place {
+    font-size: 1.7rem;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.ef-region {
+    font-size: 1.2rem;
+    color: #9bb8d8;
+}
+
+.ef-score {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 4rem;
+    padding: 0.3rem 0.5rem;
+    border: 2px solid #888888;
+    border-radius: 0.4rem;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.ef-score-grade {
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.ef-score-val {
+    font-size: 1.3rem;
+    line-height: 1.2;
+}
+
+.ef-score-of {
+    font-size: 1rem;
+    color: #9bb8d8;
+}
+
+/* Sections */
+.ef-section {
+    margin-bottom: 0.7rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(120, 180, 255, 0.1);
+}
+.ef-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.ef-section-title {
+    font-size: 1.3rem;
+    color: #7fb4ff;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.ef-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.1rem 0;
+}
+
+.ef-label {
+    color: #9bb8d8;
+}
+
+.ef-value {
+    color: #eeeeee;
+    text-align: right;
+}
+
+/* AQI badge */
+.ef-aqi-badge {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.4rem 0.6rem;
+    margin: 0.3rem 0 0.5rem 0;
+    border-radius: 0.4rem;
+    color: #000005;
+    font-weight: bold;
+}
+
+.ef-aqi-val {
+    font-size: 1.6rem;
+}
+
+.ef-aqi-label {
+    font-size: 1.2rem;
+}
+
+/* Carbon section accent */
+.ef-carbon .ef-section-title {
+    color: #ff9b6b;
+}
+
+/* Climate action section accent */
+.ef-action .ef-section-title {
+    color: #6bd8a0;
+}
+
+/* Footer */
+.ef-foot {
+    font-size: 1.05rem;
+    color: #5a7896;
+    text-align: right;
+    margin-top: 0.5rem;
+    padding-top: 0.4rem;
+    border-top: 1px solid rgba(120, 180, 255, 0.1);
+}
+
+/* Scrollbar styling for the card */
+#location-extra::-webkit-scrollbar {
+    width: 6px;
+}
+#location-extra::-webkit-scrollbar-track {
+    background: transparent;
+}
+#location-extra::-webkit-scrollbar-thumb {
+    background: rgba(120, 180, 255, 0.3);
+    border-radius: 3px;
+}
+
 #about div {
     clear: both;
 }
