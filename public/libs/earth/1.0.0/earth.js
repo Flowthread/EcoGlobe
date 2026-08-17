@@ -253,7 +253,9 @@
         var cancel = this.cancel;
         downloadsInProgress++;
         var loaded = when.map(products.productsFor(configuration.attributes), function(product) {
-            return product.load(cancel);
+            // Tolerate a missing overlay data file (e.g. 404) so the primary
+            // wind layer still renders instead of freezing the globe.
+            return product.load(cancel).otherwise(function() { return null; });
         });
         return when.all(loaded).then(function(products) {
             log.time("build grids");
