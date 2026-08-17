@@ -154,6 +154,12 @@ var everything = (function () {
     async function load(lat, lon) {
         var token = ++currentToken;
 
+        // Clamp to valid ranges: clicks near the globe's edge can yield
+        // latitude > 90 (or < -90) from the orthographic projection, which
+        // the data APIs reject. Clamp before requesting.
+        lat = Math.max(-90, Math.min(90, lat));
+        lon = Math.max(-180, Math.min(180, lon));
+
         var results = await Promise.allSettled([
             getWeather(lat, lon),
             getAirQuality(lat, lon),
