@@ -259,6 +259,14 @@
         });
         return when.all(loaded).then(function(products) {
             log.time("build grids");
+            var previous = gridAgent.value();
+            // If the primary grid failed to load (e.g. its data file 404s, which
+            // happens for altitude levels and historical time steps that aren't
+            // bundled in this repo), keep the previously rendered grid so the
+            // globe stays animated instead of going blank or erroring.
+            if (!products[0]) {
+                return previous || {primaryGrid: null, overlayGrid: null};
+            }
             return {primaryGrid: products[0], overlayGrid: products[1] || products[0]};
         }).ensure(function() {
             downloadsInProgress--;
