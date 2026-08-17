@@ -27,7 +27,29 @@ var products = function() {
             },
             load: function(cancel) {
                 var me = this;
-                return when.map(this.paths, µ.loadJson).then(function(files) {
+                // Load each data file. If a dated (historical) file 404s, retry
+                // against the "current" version of the same file so time-nav into
+                // steps we don't have bundled still renders instead of failing.
+                function loadWithFallback(path) {
+                    return µ.loadJson(path).otherwise(function(err) {
+                        if (err && err.status === 404) {
+                            // The date dir is "current" or "yyyy/mm/dd", and the
+                            // filename begins with either "current-" or an hour
+                            // stamp like "0300-". Rewrite both to "current" so a
+                            // historical step falls back to the matching current file.
+                            var slash = path.lastIndexOf("/");
+                            var dir = path.substring(0, slash);
+                            var file = path.substring(slash + 1);
+                            var rest = file.indexOf("-");
+                            if (dir !== "/data/weather/current" && rest > 0) {
+                                var fallback = "/data/weather/current/current-" + file.substring(rest + 1);
+                                return µ.loadJson(fallback);
+                            }
+                        }
+                        throw err;
+                    });
+                }
+                return when.map(this.paths, loadWithFallback).then(function(files) {
                     return cancel.requested ? null : _.extend(me, buildGrid(me.builder.apply(me, files)));
                 });
             }
