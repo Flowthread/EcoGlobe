@@ -263,9 +263,14 @@
             // If the primary grid failed to load (e.g. its data file 404s, which
             // happens for altitude levels and historical time steps that aren't
             // bundled in this repo), keep the previously rendered grid so the
-            // globe stays animated instead of going blank or erroring.
+            // globe stays animated instead of going blank or erroring. If there
+            // is no previous grid either, reject cleanly so a "No Data" status
+            // is shown rather than letting null grids crash downstream consumers.
             if (!products[0]) {
-                return previous || {primaryGrid: null, overlayGrid: null};
+                if (previous && previous.primaryGrid) {
+                    return previous;
+                }
+                return when.reject({status: 404, message: "No Data", resource: "weather grid"});
             }
             return {primaryGrid: products[0], overlayGrid: products[1] || products[0]};
         }).ensure(function() {
@@ -471,7 +476,7 @@
     }
 
     function interpolateField(globe, grids) {
-        if (!globe || !grids) return null;
+        if (!globe || !grids || !grids.primaryGrid) return null;
 
         var mask = createMask(globe);
         var primaryGrid = grids.primaryGrid;
@@ -711,7 +716,7 @@
         // When the active layer is considered "current", use its time as now, otherwise use current time as
         // now (but rounded down to the nearest three-hour block).
         var THREE_HOURS = 3 * HOUR;
-        var now = grids ? grids.primaryGrid.date.getTime() : Math.floor(Date.now() / THREE_HOURS) * THREE_HOURS;
+        var now = grids && grids.primaryGrid ? grids.primaryGrid.date.getTime() : Math.floor(Date.now() / THREE_HOURS) * THREE_HOURS;
         var parts = configuration.get("date").split("/");  // yyyy/mm/dd or "current"
         var hhmm = configuration.get("hour");
         return parts.length > 1 ?
@@ -735,7 +740,7 @@
     function showGridDetails(grids) {
         showDate(grids);
         var description = "", center = "";
-        if (grids) {
+        if (grids && grids.primaryGrid && grids.overlayGrid) {
             var langCode = d3.select("body").attr("data-lang") || "en";
             var pd = grids.primaryGrid.description(langCode), od = grids.overlayGrid.description(langCode);
             description = od.name + od.qualifier;
