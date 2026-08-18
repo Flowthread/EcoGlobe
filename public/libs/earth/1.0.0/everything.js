@@ -463,8 +463,13 @@ var everything = (function () {
             html +=   '<div class="ef-ai-text">' + esc(sentence) + '</div>';
             html += '</div>';
         } else {
-            // Proxy reachable but no actor found for this country.
-            html += '<div class="ef-empty">No climate-action data available for this location.</div>';
+            // Proxy reachable but no actor found for this country. Still show a
+            // random climate-action sentence so the section is never empty.
+            var sentence = randomClimateSentence();
+            html += '<div class="ef-ai">';
+            html +=   '<div class="ef-ai-label">AI Overview</div>';
+            html +=   '<div class="ef-ai-text">' + esc(sentence) + '</div>';
+            html += '</div>';
         }
         html += '</div>';
 
