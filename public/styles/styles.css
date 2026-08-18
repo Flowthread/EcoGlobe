@@ -466,6 +466,36 @@ body {
     font-size: 1.2rem;
 }
 
+/* AI Overview — generated summary, below the progress bar. */
+.ef-ai {
+    margin-top: 0.7rem;
+    padding: 0.55rem 0.7rem;
+    background: rgba(107, 216, 160, 0.08);
+    border: 1px solid rgba(120, 180, 255, 0.18);
+    border-left: 3px solid #6bd8a0;
+    border-radius: 0.4rem;
+}
+
+.ef-ai-label {
+    font-size: 1.05rem;
+    color: #6bd8a0;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.ef-ai-text {
+    color: #d8e6f5;
+    font-size: 1.25rem;
+    line-height: 1.45;
+}
+
+.ef-ai-empty {
+    color: #9bb8d8;
+    font-style: italic;
+}
+
 /* Footer */
 .ef-foot {
     font-size: 1.05rem;

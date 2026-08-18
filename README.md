@@ -32,6 +32,7 @@ The original wind animation, 8 map projections, and overlay system are all prese
 | Carbon (CO₂ ppm, methane, wildfire smoke) | [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api) | direct |
 | Place name (city/region/country) | [BigDataCloud reverse geocode](https://www.bigdatacloud.com/client/api) | direct |
 | National emissions, targets, net-zero, population, GDP | [OpenClimate v1 API](https://github.com/Open-Earth-Foundation/OpenClimate) | via serverless proxy |
+| AI climate-action summary (1–3 sentences) | [OpenRouter](https://openrouter.ai/) — `deepseek/deepseek-v4-flash` | via serverless proxy |
 | Map, wind animation, projections | [cambecc/earth](https://github.com/cambecc/earth) (self-hosted) | direct |
 
 ## Architecture
@@ -46,6 +47,7 @@ public/                              <- static earth visualization (Vercel stati
   styles/styles.css                  <- modified: adds health card styling
 api/
   emissions.ts                       <- NEW: Vercel serverless proxy for OpenClimate
+  climate-agent.ts                   <- NEW: Vercel serverless AI summary (OpenRouter)
 vercel.json                          <- NEW: static + serverless routing
 package.json                         <- modified: adds @vercel/node
 ```
@@ -56,14 +58,16 @@ package.json                         <- modified: adds @vercel/node
 2. earth's existing `showLocationDetails(point, coord)` runs (it already shows coordinates + wind).
 3. **New:** it also calls `everything.load(lat, lon)`, which fires the browser-direct APIs in parallel (Open-Meteo forecast, Open-Meteo air quality, BigDataCloud geocode).
 4. It then calls the `/api/emissions` serverless proxy, which looks up the country on OpenClimate and returns its emissions/targets.
-5. Results render into the `#location-extra` card with an AQI badge and health score.
+5. With the resolved climate data, it calls `/api/climate-agent`, which asks OpenRouter (`deepseek/deepseek-v4-flash`) for a 1–3 sentence summary of the country's climate action. If `OPENROUTER_API_KEY` is unset the endpoint returns 503 and the card shows an "AI summary not available" fallback without breaking.
+6. Results render into the `#location-extra` card with an AQI badge, health score, and — in the Climate Action section — an AI Overview line below the progress bar.
 
 ## Deploy on Vercel
 
 1. Fork/push this repo.
 2. Import it in [Vercel](https://vercel.com) — it auto-detects the `vercel.json` config.
-3. No environment variables needed (all APIs are keyless).
-4. Deploy. The static earth app serves from `public/`; the OpenClimate proxy runs as a serverless function at `/api/emissions`.
+3. **Set the `OPENROUTER_API_KEY` environment variable** (Project → Settings → Environment Variables) to an OpenRouter key. This is required for the AI Overview. If omitted, `/api/climate-agent` returns 503 and the card falls back to "AI summary not available" — the rest of the climate data still renders.
+4. No other environment variables needed (all other APIs are keyless).
+5. Deploy. The static earth app serves from `public/`; the OpenClimate proxy runs at `/api/emissions`; the AI summary runs at `/api/climate-agent`.
 
 Run locally without Vercel: the original `dev-server.js` serves the static app (the emissions proxy only works on Vercel, but the card gracefully omits the climate-action section if the proxy is unreachable).
 
@@ -72,6 +76,24 @@ npm install
 node dev-server.js 8080
 # open http://localhost:8080
 ```
+
+## API reference
+
+### `GET /api/emissions?q=<country>`
+OpenClimate proxy. Returns `{ success, data: { ...actor } }` with national emissions, targets, population, GDP. Keyless/CORS-open.
+
+### `POST /api/climate-agent`
+AI summary of a country's climate action. Body:
+```json
+{
+  "country": "United States",
+  "emissions": { "latestYear": 2022, "latestEmissions": 5400.0, "latestSource": "UNFCCC" },
+  "targets": 2,
+  "hasNetZero": true,
+  "actor": { "name": "United States" }
+}
+```
+Returns `{ success: true, summary: "..." }`. Requires `OPENROUTER_API_KEY` env var; without it returns `503`. Uses `deepseek/deepseek-v4-flash`, 10s timeout.
 
 ## Hackathon build breakdown
 
@@ -84,12 +106,13 @@ Per Devpost rules, here's what existed before vs. what was built during NextStep
 - All original `micro.js`, `globes.js`, `products.js`, and most of `earth.js`
 
 ### Built during the hackathon
-- **`everything.js`** — new module orchestrating 4 data APIs, with health-score computation, AQI categorization, and card rendering
+- **`everything.js`** — new module orchestrating 5 data APIs (4 browser-direct + 2 serverless), with health-score computation, AQI categorization, AI Overview rendering, and card rendering
 - **`api/emissions.ts`** — new Vercel serverless proxy bridging OpenClimate climate-action data to the browser
+- **`api/climate-agent.ts`** — new Vercel serverless function calling OpenRouter (`deepseek/deepseek-v4-flash`) to produce a 1–3 sentence climate-action summary; 503s without `OPENROUTER_API_KEY`
 - **`earth.js` modification** — hooking the environmental card into the click handler (`showLocationDetails` / `clearLocationDetails`)
 - **`index.html` modification** — the `#location-extra` container + updated metadata
-- **`styles.css` addition** — the full environmental health card UI (AQI badge, score badge, sections, scrollbar)
-- **`vercel.json`** — deployment config for static + serverless
+- **`styles.css` addition** — the full environmental health card UI (AQI badge, score badge, sections, progress bar, AI Overview block, scrollbar)
+- **`vercel.json`** — deployment config for static + serverless (`/api/emissions`, `/api/climate-agent`)
 - **`package.json`** — added `@vercel/node`
 
 ## Credits

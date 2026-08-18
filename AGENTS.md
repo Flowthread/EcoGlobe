@@ -50,4 +50,16 @@ Repo: https://github.com/Flowthread/yupp (main branch). Hack: NextStep Hacks 202
 
 ## Deployment (Vercel)
 - `vercel.json` routes every non-`/api/` path to `public/` (static) and treats `api/emissions.ts`
-  as the serverless function for `/api/emissions`. No env vars required (all APIs are keyless).
+  and `api/climate-agent.ts` as serverless functions. No env vars required except `OPENROUTER_API_KEY`
+  for the AI summary.
+
+## AI climate-action summary (api/climate-agent.ts)
+- `POST /api/climate-agent` accepts `{ country, emissions:{latestYear,latestEmissions(Mt),latestSource},
+  targets, hasNetZero, actor }` and returns `{ success, summary }` from OpenRouter
+  (`deepseek/deepseek-v4-flash`). Requires `OPENROUTER_API_KEY`; without it → 503. 10s timeout via
+  AbortController.
+- In `everything.js`, `buildClimateContext(country, emissions)` distills the OpenClimate actor into
+  the compact context (latest emissions in Mt, target count, net-zero flag). `getClimateSummary(ctx)`
+  POSTs it to the agent. The summary is attached to the load() return as `aiSummary` and rendered in
+  the Climate Action section below the progress bar ("AI Overview"). A null/failed result shows the
+  fallback "AI summary not available." and never breaks the rest of the card.

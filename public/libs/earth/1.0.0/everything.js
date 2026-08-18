@@ -22,6 +22,7 @@ var everything = (function () {
     var AIR_QUALITY_URL = "https://air-quality-api.open-meteo.com/v1/air-quality";
     var REVERSE_GEOCODE_URL = "https://api.bigdatacloud.net/data/reverse-geocode-client";
     var EMISSIONS_PROXY = "/api/emissions";
+    var CLIMATE_AGENT_URL = "/api/climate-agent";
 
     // Tracks the in-flight request so a newer click supersedes a stale one.
     var currentToken = 0;
@@ -150,6 +151,59 @@ var everything = (function () {
         }
     }
 
+    // AI summary of the country's climate action (OpenRouter via serverless
+    // proxy). Sends the already-resolved OpenClimate context so the model has
+    // concrete numbers to work with. Returns { summary } or null on any failure;
+    // failures never break the rest of the card.
+    async function getClimateSummary(ctx) {
+        if (!ctx || !ctx.country) return null;
+        try {
+            var r = await fetch(CLIMATE_AGENT_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(ctx)
+            });
+            if (!r.ok) return null;
+            var data = await r.json();
+            return data && data.success && data.summary ? { summary: data.summary } : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    // Distill an OpenClimate actor object into the compact, serializable context
+    // handed to the AI agent (and reused by render()). Picks the latest
+    // emissions record across all data sources and the most advanced target.
+    function buildClimateContext(country, e) {
+        if (!e) return { country: country || "", targets: 0, hasNetZero: false };
+        var targets = e.targets || [];
+        var hasNetZero = targets.some(function (t) { return t.is_net_zero; });
+        var emissionsSources = e.emissions ? Object.keys(e.emissions) : [];
+        var latestYear = null, latestEmissions = null, latestSource = null;
+        emissionsSources.forEach(function (dsId) {
+            var records = (e.emissions[dsId] && e.emissions[dsId].data) || [];
+            records.forEach(function (rec) {
+                if (rec.total_emissions != null && (latestYear == null || rec.year > latestYear)) {
+                    latestYear = rec.year;
+                    latestEmissions = rec.total_emissions;
+                    latestSource = e.emissions[dsId].name || dsId;
+                }
+            });
+        });
+        return {
+            country: country || "",
+            emissions: {
+                latestYear: latestYear,
+                // Convert t CO2e -> Mt CO2e/yr for the model (same as display).
+                latestEmissions: latestEmissions != null ? +(latestEmissions / 1000000).toFixed(1) : null,
+                latestSource: latestSource
+            },
+            targets: targets.length,
+            hasNetZero: hasNetZero,
+            actor: { name: e.name }
+        };
+    }
+
     // Aggregate every source for one click.
     async function load(lat, lon) {
         var token = ++currentToken;
@@ -181,6 +235,16 @@ var everything = (function () {
             if (token !== currentToken) return null;  // re-check after the await
         }
 
+        // AI climate-action summary. Built from the just-resolved OpenClimate
+        // data; the call only fires when we have a country. A null/failed result
+        // is non-fatal — the card renders without the AI Overview line.
+        var aiSummary = null;
+        if (emissions) {
+            var ctx = buildClimateContext(country, emissions);
+            aiSummary = await getClimateSummary(ctx);
+            if (token !== currentToken) return null;
+        }
+
         var c = (wx && wx.current) || {};
         var daily = (wx && wx.daily) || {};
         var a = (aq && aq.current) || {};
@@ -210,6 +274,7 @@ var everything = (function () {
             },
             carbon: { co2: a.carbon_dioxide, methane: a.methane },
             emissions: emissions,
+            aiSummary: aiSummary,
             score: score,
             scoreGrade: scoreGrade(score)
         };
@@ -363,6 +428,18 @@ var everything = (function () {
                 html +=   '</div>';
                 html += '</div>';
             }
+
+            // AI Overview — generated summary of the country's climate action.
+            // Rendered below the progress bar. Non-fatal: a missing/failed call
+            // shows a short fallback line and never breaks the rest of the card.
+            html += '<div class="ef-ai">';
+            html +=   '<div class="ef-ai-label">AI Overview</div>';
+            if (d.aiSummary && d.aiSummary.summary) {
+                html += '<div class="ef-ai-text">' + esc(d.aiSummary.summary) + '</div>';
+            } else {
+                html += '<div class="ef-ai-text ef-ai-empty">AI summary not available.</div>';
+            }
+            html += '</div>';
         } else {
             // Proxy reachable but no actor found for this country.
             html += '<div class="ef-empty">No climate-action data available for this location.</div>';
