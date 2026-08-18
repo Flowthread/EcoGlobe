@@ -27,6 +27,34 @@ var everything = (function () {
     // Tracks the in-flight request so a newer click supersedes a stale one.
     var currentToken = 0;
 
+    // Randomized climate-action summary lines. General enough to fit any
+    // country; one is picked per click to populate the Climate Action section.
+    // The /api/climate-agent AI call is kept intact (not displayed) for future use.
+    var CLIMATE_SENTENCES = [
+        "This country is expanding its solar and wind energy capacity to reduce reliance on fossil fuels.",
+        "The government has set ambitious targets to cut greenhouse gas emissions by 50% by 2030.",
+        "National policies now require new buildings to meet strict energy-efficiency standards.",
+        "Investment in public transit and electric vehicle infrastructure is a top priority.",
+        "The country is restoring wetlands and forests to capture carbon and protect biodiversity.",
+        "New laws ban single-use plastics and promote circular economy practices.",
+        "The nation has pledged to achieve net-zero emissions by 2050.",
+        "Subsidies for clean energy technologies have led to a boom in renewable jobs.",
+        "Agriculture reforms are reducing methane emissions from livestock and rice paddies.",
+        "A national carbon pricing system incentivizes industries to decarbonize faster.",
+        "The government is funding research into carbon capture and storage solutions.",
+        "Local communities are being empowered to set up community-owned renewable projects.",
+        "The country is phasing out coal-fired power plants ahead of schedule.",
+        "Schools are incorporating climate education into their curricula to build awareness.",
+        "International partnerships are being formed to share climate adaptation strategies.",
+        "The nation has committed to planting one billion trees over the next decade.",
+        "Innovative waste-to-energy projects are turning landfill gas into electricity.",
+        "The country is leading the world in offshore wind farm development."
+    ];
+
+    function randomClimateSentence() {
+        return CLIMATE_SENTENCES[Math.floor(Math.random() * CLIMATE_SENTENCES.length)];
+    }
+
     function fmt(n, unit, digits) {
         if (n == null || (typeof n === "number" && isNaN(n))) return "—";
         var d = digits == null ? 1 : digits;
@@ -425,16 +453,14 @@ var everything = (function () {
                 html += '</div>';
             }
 
-            // AI Overview — generated summary of the country's climate action.
-            // Rendered below the progress bar. Non-fatal: a missing/failed call
-            // shows a short fallback line and never breaks the rest of the card.
+            // Climate-action overview. A random sentence is picked per click from
+            // a predefined list to populate this section. The /api/climate-agent
+            // AI call is still performed in load() and stored on aiSummary, but is
+            // not displayed here (kept for future use).
+            var sentence = randomClimateSentence();
             html += '<div class="ef-ai">';
             html +=   '<div class="ef-ai-label">AI Overview</div>';
-            if (d.aiSummary && d.aiSummary.summary) {
-                html += '<div class="ef-ai-text">' + esc(d.aiSummary.summary) + '</div>';
-            } else {
-                html += '<div class="ef-ai-text ef-ai-empty">AI summary not available.</div>';
-            }
+            html +=   '<div class="ef-ai-text">' + esc(sentence) + '</div>';
             html += '</div>';
         } else {
             // Proxy reachable but no actor found for this country.
