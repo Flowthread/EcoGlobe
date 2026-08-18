@@ -172,34 +172,30 @@ var everything = (function () {
     }
 
     // Distill an OpenClimate actor object into the compact, serializable context
-    // handed to the AI agent (and reused by render()). Picks the latest
-    // emissions record across all data sources and the most advanced target.
+    // handed to the AI agent (/api/climate-agent). Sends the flat contract the
+    // endpoint prefers: country, emissions (Mt CO2e/yr), targets count, netZero.
     function buildClimateContext(country, e) {
-        if (!e) return { country: country || "", targets: 0, hasNetZero: false };
+        if (!e) return { country: country || "", emissions: null, targets: 0, netZero: false };
         var targets = e.targets || [];
         var hasNetZero = targets.some(function (t) { return t.is_net_zero; });
         var emissionsSources = e.emissions ? Object.keys(e.emissions) : [];
-        var latestYear = null, latestEmissions = null, latestSource = null;
+        var latestYear = null, latestEmissions = null;
         emissionsSources.forEach(function (dsId) {
             var records = (e.emissions[dsId] && e.emissions[dsId].data) || [];
             records.forEach(function (rec) {
                 if (rec.total_emissions != null && (latestYear == null || rec.year > latestYear)) {
                     latestYear = rec.year;
                     latestEmissions = rec.total_emissions;
-                    latestSource = e.emissions[dsId].name || dsId;
                 }
             });
         });
         return {
             country: country || "",
-            emissions: {
-                latestYear: latestYear,
-                // Convert t CO2e -> Mt CO2e/yr for the model (same as display).
-                latestEmissions: latestEmissions != null ? +(latestEmissions / 1000000).toFixed(1) : null,
-                latestSource: latestSource
-            },
+            // Convert t CO2e -> Mt CO2e/yr for the model (same as the display value).
+            emissions: latestEmissions != null ? +(latestEmissions / 1000000).toFixed(1) : null,
+            emissionsYear: latestYear,
             targets: targets.length,
-            hasNetZero: hasNetZero,
+            netZero: hasNetZero,
             actor: { name: e.name }
         };
     }

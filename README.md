@@ -83,17 +83,20 @@ node dev-server.js 8080
 OpenClimate proxy. Returns `{ success, data: { ...actor } }` with national emissions, targets, population, GDP. Keyless/CORS-open.
 
 ### `POST /api/climate-agent`
-AI summary of a country's climate action. Body:
+AI summary of a country's climate action. Body (flat contract):
 ```json
 {
   "country": "United States",
-  "emissions": { "latestYear": 2022, "latestEmissions": 5400.0, "latestSource": "UNFCCC" },
+  "emissions": 5400.0,
+  "emissionsYear": 2022,
   "targets": 2,
-  "hasNetZero": true,
+  "netZero": true,
   "actor": { "name": "United States" }
 }
 ```
-Returns `{ success: true, summary: "..." }`. Requires `OPENROUTER_API_KEY` env var; without it returns `503`. Uses `deepseek/deepseek-v4-flash`, 10s timeout.
+The endpoint also tolerates `emissions` as an object (`{latestEmissions,latestYear,latestSource}`) and `hasNetZero` as an alias for `netZero`.
+
+Returns `{ success: true, summary }` on success. On any OpenRouter failure (upstream error, timeout, empty response) it returns **`200`** with `{ success: false, summary: "AI summary not available at this time." }` so the frontend always has a displayable string. Requires `OPENROUTER_API_KEY` env var; without it returns `503` (and logs the error). Uses `deepseek/deepseek-v4-flash`, 10s timeout.
 
 ## Hackathon build breakdown
 
