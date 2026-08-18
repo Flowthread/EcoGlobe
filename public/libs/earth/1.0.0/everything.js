@@ -453,24 +453,14 @@ var everything = (function () {
                 html += '</div>';
             }
 
-            // Climate-action overview. A random sentence is picked per click from
-            // a predefined list to populate this section. The /api/climate-agent
-            // AI call is still performed in load() and stored on aiSummary, but is
-            // not displayed here (kept for future use).
-            var sentence = randomClimateSentence();
-            html += '<div class="ef-ai">';
-            html +=   '<div class="ef-ai-label">AI Overview</div>';
-            html +=   '<div class="ef-ai-text">' + esc(sentence) + '</div>';
-            html += '</div>';
-        } else {
-            // Proxy reachable but no actor found for this country. Still show a
-            // random climate-action sentence so the section is never empty.
-            var sentence = randomClimateSentence();
-            html += '<div class="ef-ai">';
-            html +=   '<div class="ef-ai-label">AI Overview</div>';
-            html +=   '<div class="ef-ai-text">' + esc(sentence) + '</div>';
-            html += '</div>';
         }
+        // Always show a random climate-action sentence, regardless of whether
+        // OpenClimate data was available — the section is never left empty.
+        var sentence = randomClimateSentence();
+        html += '<div class="ef-ai">';
+        html +=   '<div class="ef-ai-label">AI Overview</div>';
+        html +=   '<div class="ef-ai-text">' + esc(sentence) + '</div>';
+        html += '</div>';
         html += '</div>';
 
         // Footer: data sources
