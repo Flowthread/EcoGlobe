@@ -26,3 +26,28 @@ Repo: https://github.com/Flowthread/yupp (main branch). Hack: NextStep Hacks 202
 ## Click feature
 - Clicking the globe (orthographic) shows weather/carbon/air-quality/location data. Latitude
   from projection clicks is clamped/validated (TASK_1).
+
+## Environmental health card (everything.js)
+- `everything.load(lat, lon)` fires Open-Meteo forecast + air-quality + BigDataCloud reverse
+  geocode in parallel (`Promise.allSettled`), then the national climate-action data via the
+  `/api/emissions` OpenClimate proxy. A `currentToken` stale-click guard supersedes older clicks.
+- The Climate Action section is ALWAYS rendered at the bottom of the card (visually separated by
+  a top divider + green tint, class `ef-action--footer`). When the proxy returns an actor it shows:
+  latest emissions (Mt CO₂e/yr, most recent year), number of climate targets, net-zero pledge
+  (Yes/No), and a progress bar for the most advanced target (`percent_achieved`). When no actor is
+  resolved it shows an explicit "no data" state instead of omitting the section.
+- Target selection: prefer the target with the highest `percent_achieved`; if none carry a progress
+  value, fall back to the nearest `target_year` and render the bar at 0%.
+
+## expand.js caveat (IMPORTANT)
+- `public/index.html` is hand-edited and contains the `<div id="location-extra">` card container
+  that `everything.js` renders into. `public/templates/index.html` (the Swig source) does NOT
+  contain it. Therefore running `node expand.js` would regenerate `public/index.html` from the
+  template and silently REMOVE the card container, breaking the environmental health card.
+- Resolution: treat `public/index.html` as the source of truth for the built page. Do NOT re-run
+  `expand.js` without first adding the `#location-extra` div to `public/templates/index.html`
+  (and the `everything.js` script tag, which the template also lacks).
+
+## Deployment (Vercel)
+- `vercel.json` routes every non-`/api/` path to `public/` (static) and treats `api/emissions.ts`
+  as the serverless function for `/api/emissions`. No env vars required (all APIs are keyless).

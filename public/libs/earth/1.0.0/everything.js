@@ -278,7 +278,16 @@ var everything = (function () {
         html +=   row("Methane (CH₄)", fmt(cb.methane, "µg/m³"));
         html += '</div>';
 
-        // Climate action
+        // Climate Action — always rendered as a visually separated section at the
+        // bottom of the card. Data is fetched from the OpenClimate proxy
+        // (/api/emissions?q=<country>) after the place is reverse-geocoded; if the
+        // proxy returned nothing or no country was resolved, we surface an explicit
+        // "no data" state rather than silently omitting the section.
+        html += '<div class="ef-section ef-action ef-action--footer">';
+        var countryName = p.countryName || "";
+        html +=   '<div class="ef-section-title">Climate Action' +
+            (countryName ? ' · ' + esc(countryName) : "") + '</div>';
+
         if (d.emissions) {
             var e = d.emissions;
             var targets = e.targets || [];
@@ -298,7 +307,9 @@ var everything = (function () {
             var population = e.population && e.population[0];
             var gdp = e.gdp && e.gdp[0];
 
-            // Find the most progressed target with a percent_achieved value.
+            // Find the most advanced target — the one with a percent_achieved value
+            // that is furthest along. If none carry a progress value, fall back to
+            // the target with the nearest target_year so we still show a bar at 0%.
             var bestTarget = null;
             targets.forEach(function (t) {
                 if (t.percent_achieved != null &&
@@ -306,27 +317,57 @@ var everything = (function () {
                     bestTarget = t;
                 }
             });
+            if (!bestTarget && targets.length) {
+                bestTarget = targets.reduce(function (a, b) {
+                    if (a.target_year == null) return b;
+                    if (b.target_year == null) return a;
+                    return a.target_year <= b.target_year ? a : b;
+                });
+            }
             var initiative = bestTarget && bestTarget.initiative;
 
-            html += '<div class="ef-section ef-action">';
-            html +=   '<div class="ef-section-title">Climate Action · ' + esc(e.name || p.countryName || "") + '</div>';
+            // Latest national emissions (CO₂e), most recent year available.
             if (latestEmissions != null) {
-                html += row("Latest emissions", fmt((latestEmissions / 1000000), "Mt CO₂e", 1) + " (" + latestYear + ")");
+                html += row("Latest emissions", fmt((latestEmissions / 1000000), "Mt CO₂e/yr", 1) +
+                    (latestYear != null ? " (" + latestYear + ")" : ""));
                 if (latestSource) html += row("Source", esc(latestSource));
+            } else {
+                html += row("Latest emissions", "—");
             }
-            html +=   row("Reduction targets", String(targets.length));
-            html +=   row("Net-zero pledge", hasNetZero ? "Yes" : "No / unknown");
+
+            // Number of climate targets set by the country.
+            html += row("Climate targets", String(targets.length));
+
+            // Net-zero pledge status (Yes / No).
+            html += row("Net-zero pledge", hasNetZero ? "Yes" : "No");
+
             if (initiative && initiative.name) {
                 html += row("Initiative", initiative.name);
             }
-            if (bestTarget && bestTarget.target_year) {
-                var pct = bestTarget.percent_achieved != null ? fmt(bestTarget.percent_achieved, "%", 1) : "—";
-                html += row("Target " + bestTarget.target_year, pct + " achieved");
-            }
             if (population) html += row("Population", fmt(population.population, "", 0).replace(/\B(?=(\d{3})+(?!\d))/g, ","));
             if (gdp) html += row("GDP", "$" + fmt((gdp.gdp / 1000000000), "B", 1));
-            html += '</div>';
+
+            // Progress bar for the most advanced target.
+            if (bestTarget) {
+                var pctVal = bestTarget.percent_achieved;
+                var pctNum = (typeof pctVal === "number" && !isNaN(pctVal)) ? Math.max(0, Math.min(100, pctVal)) : 0;
+                var pctLabel = (pctVal != null && typeof pctVal === "number" && !isNaN(pctVal))
+                    ? fmt(pctVal, "%", 1) : "—";
+                var tgtYear = bestTarget.target_year != null ? "Target " + bestTarget.target_year : "Most advanced target";
+                html += '<div class="ef-progress-wrap">';
+                html +=   '<div class="ef-progress-label"><span>' + esc(tgtYear) + '</span>' +
+                    '<span class="ef-progress-pct">' + esc(pctLabel) + ' achieved</span></div>';
+                html +=   '<div class="ef-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100"' +
+                    (pctVal != null ? ' aria-valuenow="' + pctNum + '"' : '') + '>';
+                html +=     '<div class="ef-progress-fill" style="width:' + pctNum + '%"></div>';
+                html +=   '</div>';
+                html += '</div>';
+            }
+        } else {
+            // Proxy reachable but no actor found for this country.
+            html += '<div class="ef-empty">No climate-action data available for this location.</div>';
         }
+        html += '</div>';
 
         // Footer: data sources
         html += '<div class="ef-foot">Open-Meteo · BigDataCloud · OpenClimate</div>';
