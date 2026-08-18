@@ -12,7 +12,7 @@
  *   - BigDataCloud reverse-geocode (place name)
  *   - OpenClimate v1 API (national emissions + targets) via /api/emissions proxy
  *
- * Copyright (c) 2026 Earth Forward hackathon build.
+ * Copyright (c) 2026 EcoGlobe hackathon build.
  * The MIT License - http://opensource.org/licenses/MIT
  */
 var everything = (function () {
@@ -126,11 +126,11 @@ var everything = (function () {
 
     function scoreGrade(score) {
         if (score == null) return { grade: "—", color: "#888888" };
-        if (score >= 90) return { grade: "A", color: "#00e400" };
-        if (score >= 75) return { grade: "B", color: "#9acd32" };
-        if (score >= 60) return { grade: "C", color: "#ffff00" };
-        if (score >= 45) return { grade: "D", color: "#ff7e00" };
-        return { grade: "F", color: "#ff0000" };
+        if (score >= 90) return { grade: "A", color: "#1E8A7A" };
+        if (score >= 75) return { grade: "B", color: "#5BD1A8" };
+        if (score >= 60) return { grade: "C", color: "#F5C542" };
+        if (score >= 45) return { grade: "D", color: "#FF6B4A" };
+        return { grade: "F", color: "#FF6B4A" };
     }
 
     function esc(s) {

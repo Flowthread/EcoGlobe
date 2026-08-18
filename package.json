@@ -1,16 +1,16 @@
 {
-    "name": "earth-forward",
-    "description": "Earth Forward — global environmental intelligence. Click anywhere on Earth to see live weather, air quality, carbon, and climate action data.",
+    "name": "ecoglobe",
+    "description": "EcoGlobe — See the planet. Understand the future. Click anywhere on Earth to see live weather, air quality, carbon, and climate action data.",
     "version": "1.0.0",
     "private": true,
     "author": {
-        "name": "Cameron Beccario",
-        "email": "cambecc@nullschool.net"
+        "name": "EcoGlobe",
+        "email": "ecoglobe@flowthread.dev"
     },
-    "homepage": "https://github.com/Flowthread/yupp",
+    "homepage": "https://github.com/Flowthread/EcoGlobe",
     "repository": {
         "type": "git",
-        "url": "git://github.com/Flowthread/yupp.git"
+        "url": "git://github.com/Flowthread/EcoGlobe.git"
     },
     "engine": "node >= 0.10.21",
     "dependencies": {

@@ -39,7 +39,7 @@ a, .text-button {
 }
 
 .text-button.highlighted {
-    color: #e2b42e;
+    color: #F5C542;
 }
 
 .text-button.disabled {
@@ -47,10 +47,27 @@ a, .text-button {
 }
 
 a:hover, a:focus, .no-touch .text-button:hover, .no-touch .text-button:focus, .text-button:active {
-    color: #ffffff;
+    color: #F0F4FA;
     cursor: pointer;
     transition: color 125ms ease-in;
     -webkit-transition: color 125ms ease-in;
+}
+
+/* EcoGlobe brand logo + tagline in the top bar */
+#brand-logo {
+    width: 3.4rem;
+    height: 3.4rem;
+    vertical-align: middle;
+    margin-right: 0.6rem;
+    display: inline-block;
+}
+
+p.tagline {
+    text-align: center;
+    font-size: 1.3rem;
+    color: #1E8A7A;
+    font-style: italic;
+    margin-bottom: 1rem;
 }
 
 p.invisible, span.invisible, #sponsor.invisible {
@@ -62,8 +79,8 @@ svg {
 }
 
 body {
-    color: #eeeeee;
-    background: #000005;
+    color: #F0F4FA;
+    background: #0B0F1A;
 }
 
 #warn {
@@ -89,7 +106,7 @@ body {
     text-align: right;
     bottom: 3%;
     right: 2%;
-    background-color: rgba(0, 0, 5, 0.6);
+    background-color: rgba(18, 30, 45, 0.82);
     border-radius: 0.5rem/0.5rem;
     padding: 0.5rem 1rem 0.5rem 1rem;
     font-size: 1.0rem;
@@ -119,7 +136,7 @@ body {
 }
 
 #status, #location, #earth {
-    background-color: rgba(0, 0, 5, 0.6);
+    background-color: rgba(18, 30, 45, 0.82);
     border-radius: 0.5rem/0.5rem;
     display: table;
     margin-top: 1rem;
@@ -128,7 +145,7 @@ body {
 }
 
 #menu {
-    background-color: rgba(5, 10, 30, 0.85);
+    background-color: rgba(18, 30, 45, 0.88);
     border-radius: 0.5rem/0.5rem;
     overflow: hidden;
     pointer-events: all;
@@ -227,11 +244,11 @@ body {
 
 .background-sphere {
     stroke: none;
-    fill: #303030;
+    fill: #0B0F1A;
 }
 
 .foreground-sphere {
-    stroke: #000005;
+    stroke: #0A1E2F;
     stroke-width: 4.0;
     fill: none;
     -moz-user-select: none;  /* Oddly, Win FF sometimes selects this SVG element. Disable. */
@@ -259,11 +276,11 @@ body {
 }
 
 /**************************************************************************************************
- * Earth Forward Environmental Health Card
+ * EcoGlobe Environmental Health Card
  **************************************************************************************************/
 
 #location-extra {
-    background-color: rgba(0, 0, 5, 0.78);
+    background-color: rgba(18, 30, 45, 0.85);
     border-radius: 0.5rem/0.5rem;
     padding: 0.75rem 1rem 0.75rem 1rem;
     margin-top: 1rem;
@@ -276,7 +293,7 @@ body {
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(120, 180, 255, 0.18);
+    border: 1px solid rgba(30, 138, 122, 0.35);
 }
 
 #location-extra.invisible {
@@ -297,12 +314,12 @@ body {
     gap: 0.75rem;
     padding-bottom: 0.6rem;
     margin-bottom: 0.6rem;
-    border-bottom: 1px solid rgba(120, 180, 255, 0.15);
+    border-bottom: 1px solid rgba(30, 138, 122, 0.2);
 }
 
 .ef-place {
     font-size: 1.7rem;
-    color: #ffffff;
+    color: #F0F4FA;
     font-weight: bold;
 }
 
@@ -319,9 +336,9 @@ body {
     justify-content: center;
     min-width: 4rem;
     padding: 0.3rem 0.5rem;
-    border: 2px solid #888888;
+    border: 2px solid #F5C542;
     border-radius: 0.4rem;
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(245, 197, 66, 0.08);
 }
 
 .ef-score-grade {
@@ -344,7 +361,7 @@ body {
 .ef-section {
     margin-bottom: 0.7rem;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(120, 180, 255, 0.1);
+    border-bottom: 1px solid rgba(30, 138, 122, 0.12);
 }
 .ef-section:last-of-type {
     border-bottom: none;
@@ -353,7 +370,7 @@ body {
 
 .ef-section-title {
     font-size: 1.3rem;
-    color: #7fb4ff;
+    color: #5BD1A8;
     font-weight: bold;
     margin-bottom: 0.3rem;
     text-transform: uppercase;
@@ -372,7 +389,7 @@ body {
 }
 
 .ef-value {
-    color: #eeeeee;
+    color: #F0F4FA;
     text-align: right;
 }
 
@@ -399,12 +416,12 @@ body {
 
 /* Carbon section accent */
 .ef-carbon .ef-section-title {
-    color: #ff9b6b;
+    color: #FF6B4A;
 }
 
 /* Climate action section accent */
 .ef-action .ef-section-title {
-    color: #6bd8a0;
+    color: #1E8A7A;
 }
 
 /* Climate Action section is pinned to the bottom of the card and visually
@@ -414,8 +431,8 @@ body {
 .ef-action.ef-action--footer {
     margin-top: 0.6rem;
     padding-top: 0.8rem;
-    border-top: 1px solid rgba(120, 180, 255, 0.22);
-    background: rgba(107, 216, 160, 0.05);
+    border-top: 1px solid rgba(30, 138, 122, 0.28);
+    background: rgba(30, 138, 122, 0.08);
     border-radius: 0.4rem;
 }
 
@@ -437,22 +454,22 @@ body {
 }
 
 .ef-progress-pct {
-    color: #6bd8a0;
+    color: #1E8A7A;
     font-weight: bold;
 }
 
 .ef-progress {
     width: 100%;
     height: 0.9rem;
-    background: rgba(120, 180, 255, 0.12);
-    border: 1px solid rgba(120, 180, 255, 0.18);
+    background: rgba(30, 138, 122, 0.14);
+    border: 1px solid rgba(30, 138, 122, 0.2);
     border-radius: 0.45rem;
     overflow: hidden;
 }
 
 .ef-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #3fae72 0%, #6bd8a0 100%);
+    background: linear-gradient(90deg, #FF6B4A 0%, #F5C542 100%);
     border-radius: 0.45rem;
     transition: width 0.4s ease;
     min-width: 0;
@@ -503,7 +520,7 @@ body {
     text-align: right;
     margin-top: 0.5rem;
     padding-top: 0.4rem;
-    border-top: 1px solid rgba(120, 180, 255, 0.1);
+    border-top: 1px solid rgba(30, 138, 122, 0.12);
 }
 
 /* Scrollbar styling for the card */

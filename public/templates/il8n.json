@@ -12,11 +12,29 @@
     "earth": {
         "ja": "地球"
     },
+    "EcoGlobe": {
+        "ja": "EcoGlobe"
+    },
+    "See the planet. Understand the future.": {
+        "ja": "この惑星を見て、未来を理解する。"
+    },
     "an animated map of global wind and weather": {
         "ja": "世界中の天気状況がビジュアライズ"
     },
-    "An animated map of global wind and weather. Visit the community at https://www.facebook.com/EarthWindMap": {
-        "ja": "世界中の天気状況がビジュアライズ。コミュニティはこちらへ：https://www.facebook.com/EarthWindMap"
+    "See the planet. Understand the future. Click anywhere on Earth to see live weather, air quality, carbon, and climate action data.": {
+        "ja": "この惑星を見て、未来を理解する。世界中のどこをクリックしても、ライブの天気・大気質・炭素・気候アクションが表示されます。"
+    },
+    "about EcoGlobe": {
+        "ja": "EcoGlobe について"
+    },
+    "a visualization of global environmental conditions": {
+        "ja": "世界中の環境状況がビジュアライズ"
+    },
+    "forecast by supercomputers and live climate APIs": {
+        "ja": "スーパーコンピュータと気候APIが予報"
+    },
+    "EcoGlobe on GitHub": {
+        "ja": "GitHub の EcoGlobe"
     },
     "This site requires IE9 or newer.": {
         "ja": "このサイトはIE9より以上が必要です。"

@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Cameron Beccario
  * The MIT License - http://opensource.org/licenses/MIT
  *
- * https://github.com/cambecc/earth
+ * https://github.com/Flowthread/EcoGlobe (extends https://github.com/cambecc/earth)
  */
 var products = function() {
     "use strict";

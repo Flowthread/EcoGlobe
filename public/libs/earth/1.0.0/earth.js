@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Cameron Beccario
  * The MIT License - http://opensource.org/licenses/MIT
  *
- * https://github.com/cambecc/earth
+ * https://github.com/Flowthread/EcoGlobe (extends https://github.com/cambecc/earth)
  */
 (function() {
     "use strict";
@@ -821,7 +821,7 @@
             d3.select("#location-coord").text(µ.formatCoordinates(λ, φ));
             d3.select("#location-close").classed("invisible", false);
 
-            // Earth Forward: load the full environmental health card for this point.
+            // EcoGlobe: load the full environmental health card for this point.
             var extraEl = document.getElementById("location-extra");
             if (extraEl && everything) {
                 everything.showLoading(extraEl);
@@ -923,7 +923,7 @@
 
         d3.select("#show-menu").on("click", function() {
             if (µ.isEmbeddedInIFrame()) {
-                window.open("http://earth.nullschool.net/" + window.location.hash, "_blank");
+                window.open("https://github.com/Flowthread/EcoGlobe/" + window.location.hash, "_blank");
             }
             else {
                 d3.select("#menu").classed("invisible", !d3.select("#menu").classed("invisible"));

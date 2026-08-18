@@ -6,39 +6,40 @@
 <html>
 <head>
     <meta charset="utf-8"/>
-    <title>{{__('about earth')}}</title>
+    <title>{{__('about EcoGlobe')}}</title>
     <link rel="shortcut icon" href="/favicon.ico"/>
+    <link rel="icon" type="image/svg+xml" href="/logo.svg"/>
     <link rel="stylesheet" type="text/css" href="/styles/styles.css"/>
 
-    <link rel="alternate" hreflang="x-default" href="http://earth.nullschool.net/about.html"/>
-    <link rel="alternate" hreflang="ja" href="http://earth.nullschool.net/jp/about.html"/>
+    <link rel="alternate" hreflang="x-default" href="https://github.com/Flowthread/EcoGlobe/about.html"/>
+    <link rel="alternate" hreflang="ja" href="/jp/about.html"/>
 </head>
 <body>
 
     <div id="about">
         <div>
-            <a href="./" class="internal-link"><img id="cover" src="/cover.jpg"/></a>
+            <a href="./" class="internal-link"><img id="cover" src="/logo.svg" alt="EcoGlobe"/></a>
         </div>
-        <h1><a href="./" class="internal-link">{{__('earth')}}</a></h1>
+        <h1><a href="./" class="internal-link">EcoGlobe</a></h1>
+        <p class="tagline">{{__('See the planet. Understand the future.')}}</p>
         <div class="blurb">
-            <p class="center">{{__('a visualization of global weather conditions')}}</p>
-            <p class="center">{{__('forecast by supercomputers')}}</p>
-            <p class="center">{{__('updated every three hours')}}</p>
+            <p class="center">{{__('a visualization of global environmental conditions')}}</p>
+            <p class="center">{{__('forecast by supercomputers and live climate APIs')}}</p>
             <p class="center">&nbsp;</p>
             <p class="center">{{__("ocean surface current estimates")}}</p>
             <p class="center">{{__("updated every five days")}}</p>
         </div>
         <div>
             <p class="left">{{__('Community')}} |</p>
-            <p class="right">&nbsp;<a href="https://www.facebook.com/EarthWindMap">Facebook Page</a></p>
+            <p class="right">&nbsp;<a href="https://github.com/Flowthread/EcoGlobe">{{__('EcoGlobe on GitHub')}}</a></p>
         </div>
         <div>
             <p class="left">{{__('Author')}} |</p>
-            <p class="right">&nbsp;Cameron Beccario <a href="https://twitter.com/cambecc">@cambecc</a></p>
+            <p class="right">&nbsp;EcoGlobe (extends <a href="https://github.com/cambecc/earth">cambecc/earth</a> by Cameron Beccario)</p>
         </div>
         <div>
             <p class="left">{{__('Source')}} |</p>
-            <p class="right">&nbsp;<a href="https://github.com/cambecc/earth">github.com/cambecc/earth</a></p>
+            <p class="right">&nbsp;<a href="https://github.com/Flowthread/EcoGlobe">github.com/Flowthread/EcoGlobe</a></p>
         </div>
         <div>
             <p class="left">{{__('Modules')}} |</p>
@@ -178,21 +179,10 @@
         <div id="closing">
             <p class="center">{{__('weather and ocean data are generated from numerical models')}}</p>
             <p class="center">
-                <a href="./" class="internal-link">earth.nullschool.net</a> {{__('implies no guarantee of accuracy')}}
+                <a href="./" class="internal-link">EcoGlobe</a> {{__('implies no guarantee of accuracy')}}
             </p>
         </div>
     </div>
-
-    <script>
-        (function(i, s, o, g, r, a, m) {
-            i['GoogleAnalyticsObject'] = r;
-            i[r] = i[r] || function() { (i[r].q = i[r].q || []).push(arguments); }, i[r].l = 1 * new Date();
-            a = s.createElement(o), m = s.getElementsByTagName(o)[0];
-            a.async = 1; a.src = g; m.parentNode.insertBefore(a, m);
-        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-        ga('create', 'UA-44235933-2', 'nullschool.net');
-        ga('send', 'pageview');
-    </script>
 
 </body>
 </html>

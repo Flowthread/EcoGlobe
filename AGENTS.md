@@ -1,6 +1,11 @@
-# Earth Forward (cambecc/earth fork)
+# EcoGlobe (cambecc/earth fork)
 
-Repo: https://github.com/Flowthread/yupp (main branch). Hack: NextStep Hacks 2026.
+Repo: https://github.com/Flowthread/EcoGlobe (main branch). Hack: NextStep Hacks 2026.
+
+Brand: "EcoGlobe" — tagline "See the planet. Understand the future."
+Palette: Deep Ocean Navy #0A1E2F, Teal/Sea Green #1E8A7A, Bright Coral #FF6B4A,
+Gold #F5C542, Dark Night #0B0F1A, Clean White #F0F4FA, Glassmorphism Dark rgba(18,30,45,0.85).
+Logo: public/logo.svg.
 
 ## Run locally
 - Dev server: `node dev-server.js 8080` (express 3.4.4, serves `public/`).

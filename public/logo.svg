@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="EcoGlobe logo">
+  <defs>
+    <radialGradient id="eg-globe" cx="38%" cy="32%" r="75%">
+      <stop offset="0%" stop-color="#1E8A7A"/>
+      <stop offset="55%" stop-color="#0F4C45"/>
+      <stop offset="100%" stop-color="#0B0F1A"/>
+    </radialGradient>
+    <linearGradient id="eg-leaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5BD1A8"/>
+      <stop offset="100%" stop-color="#1E8A7A"/>
+    </linearGradient>
+    <linearGradient id="eg-ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF6B4A"/>
+      <stop offset="100%" stop-color="#F5C542"/>
+    </linearGradient>
+    <filter id="eg-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3.2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <circle cx="120" cy="118" r="86" fill="url(#eg-globe)"/>
+
+  <g fill="none" stroke="#5BD1A8" stroke-width="2.4" stroke-linecap="round" opacity="0.55">
+    <path d="M40 104 Q120 64 200 104"/>
+    <path d="M34 130 Q120 92 206 130"/>
+    <path d="M44 156 Q120 120 196 156"/>
+  </g>
+
+  <path d="M120 32 C150 70 150 166 120 204 C90 166 90 70 120 32 Z"
+        fill="none" stroke="#F0F4FA" stroke-width="2.2" opacity="0.5"/>
+
+  <g filter="url(#eg-glow)">
+    <path d="M120 96 C96 74 64 78 50 100 C66 124 100 128 120 110 C140 92 174 96 190 118
+             C176 96 144 92 120 110 C100 92 66 92 50 100"
+          fill="none" stroke="url(#eg-ring)" stroke-width="6.5" stroke-linecap="round"/>
+    <path d="M120 60 C96 96 96 140 120 176 C144 140 144 96 120 60 Z"
+          fill="none" stroke="url(#eg-leaf)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M120 96 L120 150" stroke="#5BD1A8" stroke-width="2.2" stroke-linecap="round"/>
+  </g>
+
+  <circle cx="120" cy="118" r="86" fill="none" stroke="#0A1E2F" stroke-width="2"/>
+
+  <circle cx="178" cy="64" r="9" fill="#F5C542" filter="url(#eg-glow)"/>
+</svg>
